@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 # Script to install my core programs in linux OS
+# This script works in multipel distros
 # create by: @arktnld
 #
 
