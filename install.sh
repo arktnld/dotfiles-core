@@ -42,10 +42,10 @@ exa
 var_yum=""
 # eval "$package_manager" $packages
 
-if [[ -f /etc/debian-release ]];then
+if [[ -f /etc/debian_version ]];then
     sudo apt-get update -y
     sudo apt-get upgrade -y
-    sudo apt-get install -y $(echo "$var_debian")
+    sudo apt-get install -y $(echo "$var_debian" | tr '\n' ' ')
     pip install trash-cli pyright
 elif [[ -f /etc/centos-release ]]; then
     echo test
