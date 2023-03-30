@@ -5,13 +5,6 @@
 # create by: @arktnld
 #
 
-declare -A osInfo;
-osInfo[/etc/debian_version]="apt-get install -y"
-osInfo[/etc/alpine-release]="apk install"
-osInfo[/etc/centos-release]="yum install"
-osInfo[/etc/fedora-release]="dnf install"
-osInfo[/etc/arch-release]="pacman -S"
-
 var_debian="neovim
 fzf
 nnn
@@ -47,26 +40,18 @@ github-cli
 exa
 "
 var_yum=""
-
-for f in ${!osInfo[@]}
-do
-    if [[ -f $f ]];then
-        package_manager=${osInfo[$f]}
-        echo "$package_manager"
-    fi
-done
-
 # eval "$package_manager" $packages
 
 if [[ -f /etc/debian-release ]];then
     sudo apt-get update -y
     sudo apt-get upgrade -y
-    sudo apt-get install -y
+    sudo apt-get install -y $(echo "$var_debian")
     pip install trash-cli pyright
 elif [[ -f /etc/centos-release ]]; then
+    echo test
 
 elif [[ -f /etc/arch-release ]]; then
-    echo hello2
+    echo test
 fi
 
 curl https://cht.sh/:cht.sh > ~/.local/bin/cht
