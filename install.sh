@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Script to install my core programs in linux OS
+# create by: @arktnld
+#
+
 declare -A osInfo;
 osInfo[/etc/debian_version]="apt-get install -y"
 osInfo[/etc/alpine-release]="apk install"
