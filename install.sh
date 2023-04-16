@@ -51,7 +51,8 @@ elif [[ -f /etc/centos-release ]]; then
     echo test
 
 elif [[ -f /etc/arch-release ]]; then
-    echo test
+    wget -q -O chaotic-AUR-installer.bash https://raw.githubusercontent.com/SharafatKarim/chaotic-AUR-installer/main/install.bash && sudo bash chaotic-AUR-installer.bash && rm chaotic-AUR-installer.bash
+    sudo pacman -S --noconfirm $(echo "$var_arch" | tr '\n' ' ')
 fi
 
 curl https://cht.sh/:cht.sh > ~/.local/bin/cht
