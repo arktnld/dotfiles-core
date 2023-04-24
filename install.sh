@@ -51,7 +51,7 @@ elif [[ -f /etc/centos-release ]]; then
     echo test
 
 elif [[ -f /etc/arch-release ]]; then
-   sudo pacman -S --noconfirm $(echo "$var_arch" | tr '\n' ' ')
+   paru -S --noconfirm $(echo "$var_arch" | tr '\n' ' ')
 fi
 
 curl https://cht.sh/:cht.sh > ~/.local/bin/cht
