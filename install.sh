@@ -52,6 +52,7 @@ elif [[ -f /etc/centos-release ]]; then
 
 elif [[ -f /etc/arch-release ]]; then
    paru -S --noconfirm $(echo "$var_arch" | tr '\n' ' ')
+   sudo echo "nameserver 1.1.1.1" >> /etc/resolv.conf # fix "gh auth login" error
 fi
 
 curl https://cht.sh/:cht.sh > ~/.local/bin/cht
