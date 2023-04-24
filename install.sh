@@ -66,3 +66,5 @@ mv dotfiles/.config/zsh ~/.config/
 mv dotfiles/.config/nvim ~/.config/
 mv dotfiles/.config/less ~/.config/
 mv dotfiles/.zshenv ~/
+
+mkdir ~/.local/share/zsh
