@@ -42,6 +42,22 @@ exa
 var_yum=""
 # eval "$package_manager" $packages
 
+# Define your preferred options and flags
+PARU_FLAGS="-Syu --noconfirm"  # Example flags: -Syu for system upgrade, --noconfirm to skip confirmation
+PARU_COLOR="always"           # Set the color option (always, auto, never)
+PARU_BUILD_DIR="/tmp/paru"    # Set the build directory for AUR packages
+
+# Install Paru from the AUR (if not already installed)
+if ! command -v paru &> /dev/null; then
+    git clone https://aur.archlinux.org/paru.git "$PARU_BUILD_DIR"
+    cd "$PARU_BUILD_DIR"
+    makepkg -si --noconfirm
+    cd -
+fi
+
+# Configure Paru with your preferred options
+paru --color "$PARU_COLOR" --aur --cleanafter $PARU_FLAGS
+
 if [[ -f /etc/debian_version ]];then
     sudo apt-get update -y
     sudo apt-get upgrade -y
