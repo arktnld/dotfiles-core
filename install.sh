@@ -42,24 +42,44 @@ exa
 var_yum=""
 # eval "$package_manager" $packages
 
+# Check if running with root privileges
+if [[ $EUID -ne 0 ]]; then
+    echo "This script must be run as root. Please use sudo or run as root."
+    exit 1
+fi
+
+# Install the primary key
+pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+pacman-key --lsign-key 3056513887B78AEB
+
+# Install the Chaotic keyring and mirrorlist
+pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+
+# Append to /etc/pacman.conf
+echo '[chaotic-aur]' >> /etc/pacman.conf
+echo 'Include = /etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf
+
+# Update Pacman
+pacman -Sy
+
 if [[ -f /etc/debian_version ]];then
-    sudo apt-get update -y
-    sudo apt-get upgrade -y
-    sudo apt-get install -y $(echo "$var_debian" | tr '\n' ' ')
+    apt-get update -y
+    apt-get upgrade -y
+    apt-get install -y $(echo "$var_debian" | tr '\n' ' ')
     pip install trash-cli pyright
 elif [[ -f /etc/centos-release ]]; then
     echo test
 
 elif [[ -f /etc/arch-release ]]; then
-   paru -S --noconfirm $(echo "$var_arch" | tr '\n' ' ')
-   sudo echo "nameserver 1.1.1.1" >> /etc/resolv.conf # fix "gh auth login" error
+   pacman -S --noconfirm $(echo "$var_arch" | tr '\n' ' ')
+   echo "nameserver 1.1.1.1" >> /etc/resolv.conf # fix "gh auth login" error
 fi
 
 curl https://cht.sh/:cht.sh > ~/.local/bin/cht
 chmod +x ~/.local/bin/cht
 
-sudo chsh -s /bin/zsh
-sudo timedatectl set-timezone America/Sao_Paulo
+chsh -s /bin/zsh
+timedatectl set-timezone America/Sao_Paulo
 
 git clone --recurse-submodules https://github.com/arktnld/dotfiles
 
