@@ -60,9 +60,9 @@ check_root_privileges() {
 # Function to detect the distribution
 detect_distribution() {
     if [[ -f /etc/debian_version ]]; then
-        distro="debian"
+        echo "debian"
     elif [[ -f /etc/arch-release ]]; then
-        distro="arch"
+        echo "arch"
     else
         echo "Unsupported distribution."
         exit 1
@@ -88,7 +88,7 @@ get_package_manager() {
 check_root_privileges
 
 # Detect the distribution
-detect_distribution
+distro=$(detect_distribution)
 
 
 # Get the package manager based on the distribution
