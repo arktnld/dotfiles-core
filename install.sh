@@ -128,7 +128,7 @@ for dir_info in "${directories_to_move[@]}"; do
 done
 
 # Create a directory as the regular user
-sudo -u "$username" mkdir -p "~/.local/share/zsh"
+sudo -u "$username" mkdir -p ".local/share/zsh"
 
 # Cleanup
 rm -rf dotfiles
