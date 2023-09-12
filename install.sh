@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Script to install my core programs in linux OS
-# This script works in multipel distros
-# create by: @arktnld
+# Script to install my core programs in Linux OS
+# This script works in multiple distros
+# Created by: @arktnld
 #
 
 var_debian="neovim
@@ -40,14 +40,8 @@ github-cli
 exa
 paru
 "
+
 var_yum=""
-
-# Update packages
-sudo pacman -Syu
-
-# Update keyring
-sudo pacman-key --init
-sudo pacman-key --populate archlinux
 
 # Check if running with root privileges
 if [[ $EUID -ne 0 ]]; then
@@ -55,44 +49,55 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-# Install the primary key
-sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-sudo pacman-key --lsign-key 3056513887B78AEB
-
-# Install the Chaotic keyring and mirrorlist
-sudo pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-
-# Append to /etc/pacman.conf
-sudo echo '[chaotic-aur]' >> /etc/pacman.conf
-sudo echo 'Include = /etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf
-
-# Update Pacman
-sudo pacman -Sy
-
-if [[ -f /etc/debian_version ]];then
-    sudo apt-get update -y
-    sudo apt-get upgrade -y
-    sudo apt-get install -y $(echo "$var_debian" | tr '\n' ' ')
+# Update packages
+if [[ -f /etc/debian_version ]]; then
+    apt update -y
+    apt upgrade -y
+    apt install -y $(echo "$var_debian" | tr '\n' ' ')
     pip install trash-cli pyright
 elif [[ -f /etc/centos-release ]]; then
     echo test
-
 elif [[ -f /etc/arch-release ]]; then
-   sudo pacman -S --noconfirm $(echo "$var_arch" | tr '\n' ' ')
-   echo "nameserver 1.1.1.1" >> /etc/resolv.conf # fix "gh auth login" error
+    pacman -Syu --noconfirm
+    pacman -S --noconfirm $(echo "$var_arch" | tr '\n' ' ')
+    echo "nameserver 1.1.1.1" >> /etc/resolv.conf # Fix "gh auth login" error
 fi
 
-curl https://cht.sh/:cht.sh > ~/.local/bin/cht
-chmod +x ~/.local/bin/cht
+# Update keyring
+pacman-key --init
+pacman-key --populate archlinux
 
-sudo chsh -s /bin/zsh
-sudo timedatectl set-timezone America/Sao_Paulo
+# Install the primary key
+pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+pacman-key --lsign-key 3056513887B78AEB
 
-git clone --recurse-submodules https://github.com/arktnld/dotfiles
+# Install the Chaotic keyring and mirrorlist
+pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
 
-mv dotfiles/.config/zsh ~/.config/
-mv dotfiles/.config/nvim ~/.config/
-mv dotfiles/.config/less ~/.config/
-mv dotfiles/.zshenv ~/
+# Append to /etc/pacman.conf
+echo '[chaotic-aur]' >> /etc/pacman.conf
+echo 'Include = /etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf
 
-mkdir ~/.local/share/zsh
+# Update Pacman
+pacman -Sy
+
+# Perform user-specific operations
+if [[ -f /etc/arch-release ]]; then
+    sudo -u YOUR_USERNAME chsh -s /bin/zsh
+    sudo -u YOUR_USERNAME timedatectl set-timezone America/Sao_Paulo
+
+    # Clone dotfiles repository as the regular user
+    sudo -u YOUR_USERNAME git clone --recurse-submodules https://github.com/arktnld/dotfiles
+
+    # Move user-specific configurations
+    sudo -u YOUR_USERNAME mv dotfiles/.config/zsh ~/.config/
+    sudo -u YOUR_USERNAME mv dotfiles/.config/nvim ~/.config/
+    sudo -u YOUR_USERNAME mv dotfiles/.config/less ~/.config/
+    sudo -u YOUR_USERNAME mv dotfiles/.zshenv ~/
+
+    # Create a directory as the regular user
+    sudo -u YOUR_USERNAME mkdir -p ~/.local/share/zsh
+fi
+
+# Cleanup
+rm -rf dotfiles
