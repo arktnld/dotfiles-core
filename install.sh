@@ -69,6 +69,19 @@ detect_distribution() {
     fi
 }
 
+# Function to get the package manager based on the distribution
+get_package_manager() {
+    local distro="$1"
+    if [[ $distro == "debian" ]]; then
+        echo "apt"
+    elif [[ $distro == "arch" ]]; then
+        echo "pacman"
+    else
+        echo "Unsupported distribution."
+        exit 1
+    fi
+}
+
 # Execution Section
 
 # Check for root privileges
@@ -77,9 +90,13 @@ check_root_privileges
 # Detect the distribution
 detect_distribution
 
+
+# Get the package manager based on the distribution
+package_manager=$(get_package_manager "$distro")
+
 # Update and install packages
 update_packages "$distro"
-install_packages "$distro" "$distro"
+install_packages "$package_manager" "$distro"
 
 # Perform user-specific operations
 perform_user_operations
