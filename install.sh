@@ -5,99 +5,103 @@
 # Created by: @arktnld
 #
 
-var_debian="neovim
-fzf
-nnn
-silversearcher-ag
-python-is-python3
-python3-pip
-mlocate
-man-db
-man-pages
-tree
-bc
-patool
-zsh
-git
-gh
-exa
-"
+# Function Section
 
-var_arch="neovim
-fzf
-nnn
-the_silver_searcher
-trash-cli
-mlocate
-man-db
-man-pages
-tree
-bc
-patool
-zsh
-git
-github-cli
-exa
-paru
-"
+# Define package lists for different distros
+declare -A packageLists
+packageLists["debian"]="neovim fzf nnn silversearcher-ag python-is-python3 python3-pip mlocate man-db man-pages tree bc patool zsh git gh exa"
+packageLists["arch"]="neovim fzf nnn the_silver_searcher trash-cli mlocate man-db man-pages tree bc patool zsh git github-cli exa paru"
 
-var_yum=""
+# Define distro-specific commands
+declare -A updateCommands
+updateCommands["debian"]="apt update -y"
+updateCommands["arch"]="pacman -Syu --noconfirm"
 
-# Check if running with root privileges
-if [[ $EUID -ne 0 ]]; then
-    echo "This script must be run as root. Please use sudo or run as root."
-    exit 1
-fi
+# Define user-specific operations
+userOperations=("chsh -s /bin/zsh" "timedatectl set-timezone America/Sao_Paulo")
 
-# Update packages
-if [[ -f /etc/debian_version ]]; then
-    apt update -y
-    apt upgrade -y
-    apt install -y $(echo "$var_debian" | tr '\n' ' ')
-    pip install trash-cli pyright
-elif [[ -f /etc/centos-release ]]; then
-    echo test
-elif [[ -f /etc/arch-release ]]; then
-    pacman -Syu --noconfirm
-    pacman -S --noconfirm $(echo "$var_arch" | tr '\n' ' ')
-    echo "nameserver 1.1.1.1" >> /etc/resolv.conf # Fix "gh auth login" error
-fi
+# Function to update packages
+update_packages() {
+    local distro="$1"
+    eval "${updateCommands[$distro]}"
+}
 
-# Update keyring
-pacman-key --init
-pacman-key --populate archlinux
+# Function to install packages
+install_packages() {
+    local package_manager="$1"
+    local distro="$2"
+    eval "$package_manager install -y ${packageLists[$distro]}"
+}
 
-# Install the primary key
-pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-pacman-key --lsign-key 3056513887B78AEB
+# Function to perform user-specific operations
+perform_user_operations() {
+    local current_user
+    current_user=$(whoami)
+    for operation in "${userOperations[@]}"; do
+        sudo -u "$current_user" $operation
+    done
+}
 
-# Install the Chaotic keyring and mirrorlist
-pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+# Function to move directories
+move_directories() {
+    local source_dir="$1"
+    local destination_dir="$2"
+    sudo -u "$current_user" mv "$source_dir" "$destination_dir"
+}
 
-# Append to /etc/pacman.conf
-echo '[chaotic-aur]' >> /etc/pacman.conf
-echo 'Include = /etc/pacman.d/chaotic-mirrorlist' >> /etc/pacman.conf
+# Function to check for root privileges
+check_root_privileges() {
+    if [[ $EUID -ne 0 ]]; then
+        echo "This script must be run as root. Please use sudo or run as root."
+        exit 1
+    fi
+}
 
-# Update Pacman
-pacman -Sy
+# Function to detect the distribution
+detect_distribution() {
+    if [[ -f /etc/debian_version ]]; then
+        distro="debian"
+    elif [[ -f /etc/arch-release ]]; then
+        distro="arch"
+    else
+        echo "Unsupported distribution."
+        exit 1
+    fi
+}
+
+# Execution Section
+
+# Check for root privileges
+check_root_privileges
+
+# Detect the distribution
+detect_distribution
+
+# Update and install packages
+update_packages "$distro"
+install_packages "$distro" "$distro"
 
 # Perform user-specific operations
-if [[ -f /etc/arch-release ]]; then
-    sudo -u YOUR_USERNAME chsh -s /bin/zsh
-    sudo -u YOUR_USERNAME timedatectl set-timezone America/Sao_Paulo
+perform_user_operations
 
-    # Clone dotfiles repository as the regular user
-    sudo -u YOUR_USERNAME git clone --recurse-submodules https://github.com/arktnld/dotfiles
+# Clone dotfiles repository as the regular user
+sudo -u "$current_user" git clone --recurse-submodules https://github.com/arktnld/dotfiles
 
-    # Move user-specific configurations
-    sudo -u YOUR_USERNAME mv dotfiles/.config/zsh ~/.config/
-    sudo -u YOUR_USERNAME mv dotfiles/.config/nvim ~/.config/
-    sudo -u YOUR_USERNAME mv dotfiles/.config/less ~/.config/
-    sudo -u YOUR_USERNAME mv dotfiles/.zshenv ~/
+# Move user-specific configurations
+move_directories "dotfiles/.config/zsh" "~/.config/"
+move_directories "dotfiles/.config/nvim" "~/.config/"
+move_directories "dotfiles/.config/less" "~/.config/"
+move_directories "dotfiles/.zshenv" "~/"
 
-    # Create a directory as the regular user
-    sudo -u YOUR_USERNAME mkdir -p ~/.local/share/zsh
-fi
+# Create a directory as the regular user
+sudo -u "$current_user" mkdir -p "~/.local/share/zsh"
 
 # Cleanup
 rm -rf dotfiles
+
+# Optional: Configure Pacman color
+# if [[ $distro == "arch" ]]; then
+#    echo 'Color' >> /etc/pacman.conf
+# fi
+
+echo "Installation complete."
