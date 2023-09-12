@@ -42,6 +42,10 @@ exa
 var_yum=""
 # eval "$package_manager" $packages
 
+# Update keyring
+pacman-key --init
+pacman-key --populate archlinux
+
 # Check if running with root privileges
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root. Please use sudo or run as root."
