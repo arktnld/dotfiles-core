@@ -38,6 +38,7 @@ zsh
 git
 github-cli
 exa
+paru
 "
 var_yum=""
 
