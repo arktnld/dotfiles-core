@@ -1,6 +1,6 @@
 ## Dotfiles-Core Installation
 
-Dotfiles-Core is a script that allows you to easily install core programs and configurations on your Linux system. To install Dotfiles-Core, follow these steps:
+Dotfiles-Core is a script that allows you to easily install core programs and configurations on your Linux system.
 
 #### Installation Command
 
